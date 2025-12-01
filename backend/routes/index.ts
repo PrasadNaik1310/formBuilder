@@ -1,14 +1,15 @@
 import { Router } from "express";
-import { airtableLogin } from "../handlers/auth";
+import { login } from "../handlers/auth";
 import { createForm, getForm } from "../handlers/form";
 import { submitForm, listResponses } from "../handlers/response";
 import { airtableWebhook } from "../handlers/webhook";
 import { requireAuth } from "../middleware/auth";
 
+
 const router = Router();
 
 // Auth
-router.post("/auth/login", airtableLogin);
+router.post("/auth/login", login);
 
 // Forms
 router.post("/forms", requireAuth, createForm);
