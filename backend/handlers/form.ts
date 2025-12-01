@@ -2,11 +2,15 @@ import { Request, Response } from "express";
 import { Form } from "../models/form";
 
 // Create a new form
-export const createForm = async (req: Request, res: Response) => {
+export const createForm = async (req: Request & { user?: { userId: string } }, res: Response) => {
     try {
         const { airtableBaseId, airtableTableId, questions } = req.body;
         if (!airtableBaseId || !airtableTableId || !questions) {
             return res.status(400).json({ error: "Missing fields" });
+        }
+
+        if (!req.user || !req.user.userId) {
+            return res.status(401).json({ error: "Unauthorized" });
         }
 
         const form = await Form.create({

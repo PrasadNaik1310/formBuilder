@@ -1,17 +1,19 @@
 import { Schema, model, Document } from "mongoose";
 
 export interface IUser extends Document {
-    airtableUserId: string;
+    airtableId: string;
+    email: string;
     accessToken: string;
-    refreshToken?: string;
-    lastLogin: Date;
+    refreshToken: string;
+    loginAt: Date;
 }
 
-const UserSchema = new Schema<IUser>({
-    airtableUserId: { type: String, required: true, unique: true },
+const userSchema = new Schema<IUser>({
+    airtableId: { type: String, required: true, unique: true },
+    email: { type: String, required: true },
     accessToken: { type: String, required: true },
-    refreshToken: { type: String },
-    lastLogin: { type: Date, default: Date.now }
+    refreshToken: { type: String, required: true },
+    loginAt: { type: Date, default: Date.now }
 });
 
-export default model<IUser>("User", UserSchema);
+export const User = model<IUser>("User", userSchema);
