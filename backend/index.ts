@@ -7,14 +7,17 @@ import cors from "cors";
 dotenv.config();
 
 const app = express();
-app.use(express.json());
-app.use("/api", router);
+
+// Enable CORS BEFORE routes
 app.use(
   cors({
     origin: "http://localhost:5173", 
-    //credentials: true, 
+    credentials: true, 
   })
 );
+
+app.use(express.json());
+app.use("/api", router);
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/formbuilder";

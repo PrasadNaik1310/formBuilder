@@ -1,44 +1,32 @@
 // src/pages/home.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-const Home: React.FC = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+export default function HomePage() {
+  const [message, setMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log({ name, email });
-    alert(`Submitted: Name=${name}, Email=${email}`);
+  const fetchData = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return setMessage("No token found");
+
+    try {
+      const res = await axios.get("http://localhost:5000/api/forms", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMessage(JSON.stringify(res.data, null, 2));
+    } catch (err: any) {
+      setMessage(err.response?.data?.error || "Error fetching data");
+    }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <div style={{ padding: "20px" }}>
       <h2>Home Page</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name: </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-        <div style={{ marginTop: "10px" }}>
-          <label>Email: </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <button style={{ marginTop: "15px" }} type="submit">
-          Submit
-        </button>
-      </form>
+      <pre>{message}</pre>
     </div>
   );
-};
-
-export default Home;
+}

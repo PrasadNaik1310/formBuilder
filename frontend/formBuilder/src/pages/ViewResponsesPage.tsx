@@ -1,30 +1,33 @@
-import { useEffect, useState } from "react";
+// src/pages/ViewResponsesPage.tsx
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
 export default function ViewResponsesPage() {
-  const { formId } = useParams();
-  const [responses, setResponses] = useState([]);
+  const { formId } = useParams<{ formId: string }>();
+  const [responses, setResponses] = useState<any[]>([]);
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    load();
-  }, []);
-
-  async function load() {
-    const token = localStorage.getItem("token");
-    const res = await axios.get(`/api/forms/${formId}/responses`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    setResponses(res.data);
-  }
+    const fetchResponses = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/forms/${formId}/responses`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setResponses(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchResponses();
+  }, [formId]);
 
   return (
-    <div>
-      <h3>Responses</h3>
-
-      {responses.map((r: any, i) => (
-        <pre key={i}>{JSON.stringify(r, null, 2)}</pre>
+    <div style={{ padding: "20px" }}>
+      <h2>Responses</h2>
+      {responses.map((r) => (
+        <pre key={r._id}>{JSON.stringify(r.answers, null, 2)}</pre>
       ))}
     </div>
   );

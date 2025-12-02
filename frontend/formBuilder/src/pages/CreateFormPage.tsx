@@ -1,38 +1,90 @@
-import { useState } from "react";
+// src/pages/CreateFormPage.tsx
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import type { ConditionalRules } from "../../../../backend/utils/conditionals";
+
+interface Field {
+  id: string;
+  name: string;
+  type: string;
+  required: boolean;
+  conditionalRules?: ConditionalRules | null;
+}
 
 export default function CreateFormPage() {
-  const [name, setName] = useState("");
-  const navigate = useNavigate();
+  const [fields, setFields] = useState<Field[]>([]);
+  const [selectedFields, setSelectedFields] = useState<Field[]>([]);
+  const [formName, setFormName] = useState("");
+  const token = localStorage.getItem("token");
 
-  async function createForm() {
+  const handleAddConditionalRule = (fieldId: string) => {
+    const question = selectedFields.find((f) => f.id === fieldId);
+    if (!question) return;
+
+    const newRules: ConditionalRules = {
+      logic: "AND",
+      conditions: [
+        {
+          questionKey: "", // fill in later
+          operator: "equals",
+          value: "",
+        },
+      ],
+    };
+
+    question.conditionalRules = newRules;
+    setSelectedFields([...selectedFields]);
+  };
+
+  const handleSubmit = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      const res = await axios.post("/api/forms",
-        { name },
+      await axios.post(
+        "http://localhost:5000/api/forms",
+        {
+          name: formName,
+          questions: selectedFields.map((f) => ({
+            questionKey: f.id,
+            label: f.name,
+            type: f.type,
+            required: f.required,
+            conditionalRules: f.conditionalRules || null,
+          })),
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      navigate(`/forms/${res.data._id}`);
+      alert("Form created!");
     } catch (err) {
-      console.log(err);
-      alert("Failed to create form");
+      console.error(err);
     }
-  }
+  };
 
   return (
-    <div>
+    <div style={{ padding: "20px" }}>
       <h2>Create Form</h2>
+      <div>
+        <label>Form Name:</label>
+        <input value={formName} onChange={(e) => setFormName(e.target.value)} />
+      </div>
 
-      <input
-        placeholder="Form Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      /><br />
+      {/* Fields selection UI simplified */}
+      {fields.map((f) => (
+        <div key={f.id}>
+          <input
+            type="checkbox"
+            checked={selectedFields.includes(f)}
+            onChange={(e) => {
+              if (e.target.checked) setSelectedFields([...selectedFields, f]);
+              else setSelectedFields(selectedFields.filter((x) => x.id !== f.id));
+            }}
+          />
+          {f.name} ({f.type})
+          <button onClick={() => handleAddConditionalRule(f.id)}>Add Logic</button>
+        </div>
+      ))}
 
-      <button onClick={createForm}>Create</button>
+      <button onClick={handleSubmit} style={{ marginTop: "10px" }}>
+        Create Form
+      </button>
     </div>
   );
 }

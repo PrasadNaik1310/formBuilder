@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login } from "../handlers/auth";
+import { login, register } from "../handlers/auth";
 import { createForm, getForm } from "../handlers/form";
 import { submitForm, listResponses } from "../handlers/response";
 import { airtableWebhook } from "../handlers/webhook";
@@ -9,6 +9,7 @@ import { requireAuth } from "../middleware/auth";
 const router = Router();
 
 // Auth
+router.post("/auth/register", register);
 router.post("/auth/login", login);
 
 // Forms

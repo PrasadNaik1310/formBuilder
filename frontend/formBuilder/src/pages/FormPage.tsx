@@ -1,21 +1,38 @@
-import { useNavigate, useParams } from "react-router-dom";
+// src/pages/FormPage.tsx
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
 
 export default function FormPage() {
-  const { formId } = useParams();
-  const navigate = useNavigate();
+  const { formId } = useParams<{ formId: string }>();
+  const [form, setForm] = useState<any>(null);
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchForm = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/forms/${formId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setForm(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchForm();
+  }, [formId]);
+
+  if (!form) return <div>Loading...</div>;
 
   return (
-    <div>
-      <h2>Form Page</h2>
-      <p>Form ID: {formId}</p>
-
-      <button onClick={() => navigate(`/forms/${formId}/submit`)}>
-        Submit Response
-      </button>
-
-      <button onClick={() => navigate(`/forms/${formId}/responses`)}>
-        View Responses
-      </button>
+    <div style={{ padding: "20px" }}>
+      <h2>{form.name}</h2>
+      {form.questions.map((q: any) => (
+        <div key={q.questionKey}>
+          <label>{q.label}</label>
+          <input type="text" disabled />
+        </div>
+      ))}
     </div>
   );
 }
