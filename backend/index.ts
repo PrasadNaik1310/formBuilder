@@ -2,12 +2,19 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import router from "./routes";
+import cors from "cors";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 app.use("/api", router);
+app.use(
+  cors({
+    origin: "http://localhost:5173", 
+    //credentials: true, 
+  })
+);
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/formbuilder";

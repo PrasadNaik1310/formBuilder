@@ -1,20 +1,20 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/home";
-import FormBuilder from "./pages/FormBuilder";
-import FormViewer from "./pages/FormViewer";
-//import Responses from "./pages/Responses";
+import { Routes, Route } from "react-router-dom";
+import LoginPage from "./pages/loginPage";
+import HomePage from "./pages/home";
+import CreateFormPage from "./pages/CreateFormPage";
+import FormPage from "./pages/FormPage";
+import SubmitResponsePage from "./pages/SubmitResponsePage";
+import ViewResponsesPage from "./pages/ViewResponsesPage";
 
-function App() {
+export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/form-builder" element={<FormBuilder />} />
-        <Route path="/form/:formId" element={<FormViewer />} />
-        {/* <Route path="/forms/:formId/responses" element={<Responses />} /> */}
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/" element={<LoginPage />} />
+      <Route path="/home" element={<HomePage />} />
+      <Route path="/forms/create" element={<CreateFormPage />} />
+      <Route path="/forms/:formId" element={<FormPage />} />
+      <Route path="/forms/:formId/submit" element={<SubmitResponsePage />} />
+      <Route path="/forms/:formId/responses" element={<ViewResponsesPage />} />
+    </Routes>
   );
 }
-
-export default App;
