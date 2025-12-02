@@ -1,6 +1,6 @@
 // src/pages/FormBuilder.tsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api";
 
 // Frontend copy of conditional types
 export type Operator = "equals" | "notEquals" | "contains";
@@ -40,14 +40,17 @@ export default function FormBuilder() {
 
   // Fetch Airtable bases
   useEffect(() => {
-    axios
-      .get("/api/airtable/bases")
+    console.log("Fetching bases...");
+    api
+      .get("/airtable/bases")
       .then((res) => {
+        console.log("Bases response:", res.data);
         const data = Array.isArray(res.data) ? res.data : [];
         setBases(data);
       })
       .catch((err) => {
         console.error("Failed to fetch bases:", err);
+        console.error("Error response:", err.response?.data);
         // Dummy options if API fails
         setBases([
           { id: "base1", name: "Demo Base 1" },
@@ -63,8 +66,8 @@ export default function FormBuilder() {
       return;
     }
 
-    axios
-      .get(`/api/airtable/tables?baseId=${selectedBase}`)
+    api
+      .get(`/airtable/tables?baseId=${selectedBase}`)
       .then((res) => {
         const data = Array.isArray(res.data) ? res.data : [];
         setTables(data);
@@ -86,8 +89,8 @@ export default function FormBuilder() {
       return;
     }
 
-    axios
-      .get(`/api/airtable/fields?baseId=${selectedBase}&tableId=${selectedTable}`)
+    api
+      .get(`/airtable/fields?baseId=${selectedBase}&tableId=${selectedTable}`)
       .then((res) => {
         const data = Array.isArray(res.data) ? res.data : [];
         setFields(data);
@@ -122,8 +125,8 @@ export default function FormBuilder() {
       return;
     }
 
-    axios
-      .post("/api/forms", {
+    api
+      .post("/forms", {
         baseId: selectedBase,
         tableId: selectedTable,
         questions: formFields,
